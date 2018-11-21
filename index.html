@@ -20,37 +20,38 @@
 </head>
 <body >
   <div class="container-fluid h-100">
-    <div class="row  h-50">
-      <div class="col-12 h-100">
-        <div class="row h-50">
-          <div class="col-12">
+    <div class="row h-100">
+      <div class="col-6 h-100 border-rt">
+        <div class="row h-50 border-bt">
+          <div class="col-12 radial-scatter">
             <div class="upload-file">
-              <div class="heading">Upload your sample data here.</div>
               <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="csv-upload">Upload</span>
-                </div>
-                <div class="custom-file">
-                  <input type="file" class="custom-file-input" id="csv-file" aria-describedby="csv-upload">
-                  <label class="custom-file-label" for="inputGroupFile01">Upload CSV</label>
+                <div class="custom-file m-15">
+                  <label class="btn btn-default btn-file">
+                      Upload dataset (.csv) <input type="file" class="custom-file-input" id="csv-file" style="display: none;">
+                  </label>
                 </div>
               </div>
             </div>
             <div class="filters" style="display: none">
-              <!-- <select class="selectpicker country"></select>
-              <select class="selectpicker genres"></select> -->
-              <select class="country"></select>
-              <select class="genres"></select>
+              Filters: 
+              <select data-size="10"  class="country"></select>
+              <select data-size="10"  class="genres"></select>
             </div>
             <div class="scatter-container"></div>
           </div>
         </div>
+        <div class="row h-50">
+          <div class="col-12 radial-revenue">
+            <div id="revenue" class="revenue">
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="row h-50">
-      <div class="col-12">
+      <div class="col-6 h-100 radial-node">
         <div id="nodes" class="nodes">
         </div>
+        <span class="footnote" style="display: none"> * Right click for options </span>
       </div>
     </div>
   </div>
@@ -58,6 +59,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
   <script src="js/bootstrap-select.min.js"></script>
   <script src="js/cytoscape.min.js"></script>
+  <script src="js/cytoscape-context-menus.js"></script>
+  <link rel="stylesheet" href="css/cytoscape-context-menus.css">
   <script src="js/main.js"></script>
+  <script src="js/notify.js"></script>
 </body>
 </html>

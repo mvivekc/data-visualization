@@ -1,79 +1,228 @@
 var MinYear = 1960;
 var MaxYear = (new Date()).getFullYear();
-var Chart = {
-  "chart": {
-    "type": "scatter",
-    "zoomType": "xy"
-  },
-  "title": {
-    "text": "Year vs IMDB Rating of Movies"
-  },
-  "subtitle": {
-    "text": "Source: Github link"
-  },
-  "xAxis": {
-    min: MinYear,
-    max: MaxYear,
-    "title": {
-      "enabled": true,
-      "text": "Year(YYYY)"
-    },
-    "startOnTick": true,
-    "endOnTick": true,
-    "showLastLabel": true
-  },
-  "yAxis": {
-    min: 0, 
-    max: 10,
-    "title": {
-      "text": "IMDB Rating ( out of 10 )"
+var doubleClickDelayMs = 350;
+var hueColors = {
+  1: "#d10f02",
+  2: "#EB4F1F",
+  3: "#FF8055",
+  4: "#F6AC33",
+  5: "#B5A108",
+  6: "#f7eb11",
+  7: "#1CA79B",
+  8: "#0C7291",
+  9: "#E60093"
+}
+var previousTapStamp;
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+function randomString(length) {
+    var result = '', chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+    return result;
+}
+function toIdName(name){
+  return name.toLowerCase().replaceAll('\\s', "").replaceAll('\\W', "-");
+}
+function getNode(id, name, type) {
+  //colors: ['#51b5ce', '#89c733', '#54a329','#2f7ed8', '#0d233a', '#8bbc21', '#910000', '#1aadce', '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a'],
+  var colors = {
+    "director": "#2f7ed8",
+    "movie": "#0d233a",
+    "actor": "#8bbc21"
+  }
+  this.Nodes[id] = { id: id, name: name, faveColor: '#ccc'};
+  if (type) {
+    this.Nodes[id].faveColor = colors[type];
+    this.Nodes[id].type = type;
+  }
+  return this.Nodes[id];
+}
+function getEdge(src, target, type) {
+  var id = randomString(16);
+  this.Edges[id] = { id: id,
+    source: src,
+    target: target
+  };
+  return this.Edges[id];
+}
+function addActorsAndMovie(movie){
+  var actorsToAdd = ['actor_1_name', 'actor_2_name', 'actor_2_name'];
+  var directorId = toIdName(movie.director_name);
+  var movieId = toIdName(movie.movie_title);
+  var finalToAdd = [{group: "nodes", data: getNode(directorId, movie.director_name, "director")}];
+  finalToAdd.push({group: "nodes", data: getNode(movieId, movie.movie_title, "movie")});
+  finalToAdd.push({group: "edges", data: getEdge(movieId, directorId)});
+  var alreadyProcessed = [];
+  _.forEach(actorsToAdd, function(actorField) {
+    if (!movie[actorField] || alreadyProcessed.indexOf(movie[actorField]) > -1) {
+      return
     }
-  },
-  "legend": {
-    "layout": "vertical",
-    "align": "left",
-    "verticalAlign": "top",
-    "x": 100,
-    "y": 70,
-    "floating": true,
-    "borderWidth": 1
-  },
-  "plotOptions": {
-    "scatter": {
-      "marker": {
-        "radius": 2,
+    alreadyProcessed.push(movie[actorField]);
+    var actorId= toIdName(movie[actorField]);
+    finalToAdd.push({group: "nodes", data: getNode(actorId, movie[actorField], "actor")})
+    finalToAdd.push({group: "edges", data: getEdge(movieId, actorId)})
+  })
+  updateGraph(finalToAdd)
+}
+function updateGraph(finalToAdd){
+  cy.add(finalToAdd)
+  setTimeout(function(){
+    cy.layout({
+      name: 'cose'
+    }).run()
+  }, 100);
+}
+function pointClick(e) {
+  addActorsAndMovie(Demo.Movies[e.point.id]);
+}
+var Chart = {
+  scatter: {
+    "chart": {
+      "type": "scatter",
+      "zoomType": "xy",
+      backgroundColor: 'rgba(255, 255, 255, 0.0)'
+    },
+    "title": {
+      "text": "IMDB Rating distribution over the years"
+    },
+    subtitle: {
+     text: 'Click for movie/actor associations'
+    },
+    "xAxis": {
+      min: MinYear,
+      max: MaxYear,
+      "title": {
+        "enabled": true,
+        "text": "Year"
+      },
+      "startOnTick": true,
+      "endOnTick": true,
+      "showLastLabel": true
+    },
+    "yAxis": {
+      min: 0, 
+      max: 10,
+      "title": {
+        "text": "IMDB Rating"
+      }
+    },
+    "legend": {
+      "layout": "vertical",
+      "align": "left",
+      "verticalAlign": "bottom",
+      "x": 60,
+      "y": -60,
+      "floating": true,
+      "borderWidth": 1,
+      backgroundColor: 'rgba(255, 255, 255, 0.0)'
+    },
+    "plotOptions": {
+      "scatter": {
+        color: "",
+        events: {
+          click: pointClick
+        },
+        "marker": {
+          "radius": 3,
+          "states": {
+            "hover": {
+              "enabled": true,
+              "lineColor": "rgb(100,100,100)"
+            }
+          }
+        },
         "states": {
           "hover": {
-            "enabled": true,
-            "lineColor": "rgb(100,100,100)"
-          }
-        }
-      },
-      "states": {
-        "hover": {
-          "marker": {
-            "enabled": false
+            "marker": {
+              "enabled": false
+            }
           }
         }
       }
+    },
+    "series": [],
+    "tooltip": {
+      useHTML: true,
+      formatter: function(point) {
+        var tooltip = `<div>${this.point.movie} (${this.point.x})</div>`
+        if (!isNaN(parseInt(this.point.gross))) {
+          tooltip += `<div>Gross: ${nFormatter(this.point.gross, 2)}</div>`;
+        }
+        if (!isNaN(parseInt(this.point.budget))) {
+          tooltip += `<div>Budget: ${nFormatter(this.point.budget, 2)}</div>`;
+        }
+        tooltip += `<div><b>Rating</b>: ${this.point.y}</div>`;
+        return tooltip;
+      }
+    },
+    credits: {
+      enabled: false
     }
   },
-  "series": [],
-  "tooltip": {
-    formatter: function(point) {
-      var tooltip = "Movie</b>: "+this.point.movie
-      if (!isNaN(parseInt(this.point.gross))) {
-      tooltip += ", Gross: "+nFormatter(this.point.gross, 2);
+  bar: {
+    credits: {
+      enabled: false
+    },
+    legend: {
+      layout: 'vertical',
+      align: 'right',
+      verticalAlign: 'top',
+      floating: true,
+      backgroundColor: 'rgba(255, 255, 255, 0.0)'
+    },
+    chart: {
+      type: 'column',
+      backgroundColor: 'rgba(255, 255, 255, 0.0)'
+    },
+    title: {
+        text: ''
+    },
+    xAxis: {
+      categories: [],
+      crosshair: true,
+      title: {
+        text: 'Movies'
       }
-      if (!isNaN(parseInt(this.point.budget))) {
-      tooltip += ", Budget: "+nFormatter(this.point.budget, 2);
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Revenue (in USD )'
       }
-      tooltip += ", Rating: "+this.point.y+", Year: "+this.point.x;
-      return tooltip;
+    },
+    plotOptions: {
+      column: {
+        pointPadding: 0.2,
+        borderWidth: 0
+      }
+    },
+    series: [],
+    tooltip: {
+      useHTML: true,
+      shared: true,
+      formatter: function(point) {
+        var revenue = this.points[0]
+        var budget = this.points[1]
+        var tooltip = `<div>${revenue.x}</div>`
+        if (revenue && revenue.y && !isNaN(parseInt(revenue.y))) {
+          tooltip += `<div>Gross earnings: ${nFormatter(revenue.y, 2)}</div>`;
+        }
+        if (budget && budget.y && !isNaN(parseInt(budget.y))) {
+          tooltip += `<div>Movie budget: ${nFormatter(budget.y, 2)}</div>`;
+        }
+        if (revenue && budget && revenue.y && budget.y) {
+          var net = (revenue.y > budget.y)? (revenue.y - budget.y): (budget.y - revenue.y);
+          var type = (revenue.y > budget.y)? {cls: "green", text: "Profit"}: {cls: "red", text: "Loss"};
+          tooltip += `<div><b>Net profit</b>: <span class='${type.cls}'>${nFormatter(net, 2)} ${type.text}</span></div>`;
+        }
+        return tooltip;
+      }
     }
   }
 }
-
 function nFormatter(num, digits) {
   var si = [
     { value: 1, symbol: "" },
@@ -105,9 +254,13 @@ function stringToArray(text, headerPresent) {
   return final;
 }
 function setParams() {
+  this.Movies = {}
+  this.Nodes = {}
+  this.Edges = {}
   this.$browse = $("#csv-file");
   this.$genres = $(".genres");
   this.$countries = $(".country");
+  this.$revenues = $("#revenue")
 
 }
 function readCsv(parseData) {
@@ -147,7 +300,6 @@ function parseCSV(result){
     byCountry: {}
   }
   var arrayValue = stringToArray(result, true);
-  this.Movies = {}
   _.map(arrayValue, function(item) {
     var obj = _.zipObject(this.Header, item);
     try {
@@ -163,7 +315,7 @@ function parseCSV(result){
       }
     }
   });
-  this.Series = [
+  this.scatterSeries = [
     {
       name: "Movies",
       color: "rgba(0, 0, 255, 0.7)",
@@ -185,7 +337,6 @@ function parseCSV(result){
   })
   renderFilters();
   renderChart();
-  renderNodes();
 }
 function renderNodes() {
   cytoscape({
@@ -199,22 +350,26 @@ function renderNodes() {
     style: cytoscape.stylesheet()
       .selector('node')
         .css({
-          'shape': 'data(faveShape)',
-          'content': 'data(name)',
-          'background-color': 'data(faveColor)',
-          'color': '#fff'
-        })
-      .selector(':selected')
-        .css({
-          'border-width': 3,
-          'border-color': '#333'
-        })
+        'content': 'data(name)',
+        'font-size': 8,
+        'background-color': '#E89393',
+        'text-outline-color': 'data(faveColor)',
+        'background-color': 'data(faveColor)'
+      }).selector('.director')
+      .css({
+        'background-color': '#B999F3'
+      }).selector('.movie')
+      .css({
+        'background-color': '#FF0000'
+      })
       .selector('edge')
-        .css({
-          'opacity': 0.666,
-          'width': 'mapData(strength, 70, 100, 2, 6)',
-          'line-color': 'data(faveColor)',
-        })
+      .css({
+        'curve-style': 'bezier',
+        'width': 2,
+        'target-arrow-shape': 'triangle',
+        'line-color': '#ffaaaa',
+        'target-arrow-color': '#ffaaaa'
+      })
       .selector('.faded')
         .css({
           'opacity': 0.25,
@@ -222,37 +377,99 @@ function renderNodes() {
         }),
 
     elements: {
-      nodes: [
-        /*{ data: { id: 'j', name: 'Jerry', weight: 65, faveColor: '#6FB1FC', faveShape: 'triangle' } },
-        { data: { id: 'e', name: 'Elaine', weight: 45, faveColor: '#EDA1ED', faveShape: 'ellipse' } },
-        { data: { id: 'k', name: 'Kramer', weight: 75, faveColor: '#86B342', faveShape: 'octagon' } },
-        { data: { id: 'g', name: 'George', weight: 70, faveColor: '#F5A45D', faveShape: 'rectangle' } }*/
-      ],
-      edges: [
-        /*{ data: { source: 'j', target: 'e', faveColor: '#ccc', strength: 80 } },
-        { data: { source: 'j', target: 'k', faveColor: '#ccc', strength: 80 } },
-        { data: { source: 'j', target: 'g', faveColor: '#ccc', strength: 80 } },
-        { data: { source: 'e', target: 'j', faveColor: '#ccc', strength: 80 } },
-        { data: { source: 'e', target: 'k', faveColor: '#ccc', strength: 80 }, classes: 'questionable' },
-        { data: { source: 'k', target: 'j', faveColor: '#ccc', strength: 80 } },
-        { data: { source: 'k', target: 'e', faveColor: '#ccc', strength: 80 } },
-        { data: { source: 'k', target: 'g', faveColor: '#ccc', strength: 80 } },
-        { data: { source: 'g', target: 'j', faveColor: '#ccc', strength: 80 } }*/
-      ]
+      nodes: [],
+      edges: []
     },
-
-    /*cy.add([
-      {group: "nodes", data: { id: 'v', name: 'Vivek', weight: 65, faveColor: '#ccc', faveShape: 'triangle' }},
-      { group: "edges", data: { source: 'j', target: 'v', faveColor: '#ccc', strength: 80 }}
-    ])
-    cy.layout({
-      name: 'cose'
-    }).run()
-    */
     ready: function(){
       window.cy = this;
+      addGraphEvents();
     }
   });
+}
+function showRevenueFor(clickedItem){
+  var nodeObj = Demo.Nodes[clickedItem.target.id()];
+  var data = _.filter(Demo.Movies, function(movie){
+    if (nodeObj.type === "actor") {
+      return movie.actor_3_name === nodeObj.name || movie.actor_2_name === nodeObj.name || movie.actor_1_name === nodeObj.name;
+    } else {
+      return movie.director_name === nodeObj.name;
+    }
+  });
+  if (nodeObj.type === "movie") {
+    data = _.filter(Demo.Movies, {movie_title: nodeObj.name})
+  }
+  var final = [
+    {
+      name: "Revenue",
+      data: [],
+      color: '#658CFF'
+    },
+    {
+      name: "Budget",
+      data: [],
+      color: '#FCAD12'
+    },
+  ]
+  Chart.bar.xAxis.categories = []
+  _.map(data, function(movie){
+    Chart.bar.xAxis.categories.push(movie.movie_title)
+    final[0].data.push(parseInt(movie.gross))
+    final[1].data.push(parseInt(movie.budget))
+  });
+  Chart.bar.title.text = `Revenue for ${nodeObj.name}`;
+  Chart.bar.series = final;
+  Chart.bar.chart.height = $revenues.parent().outerHeight()
+  Chart.bar.chart.width = $revenues.outerWidth()
+  Highcharts.chart(Demo.$revenues[0], Chart.bar);
+}
+function addGraphEvents() {
+  cy.on('click', 'node', function(evt){
+    var nodeObj = Demo.Nodes[this.id()];
+    addAssociationsFor(nodeObj)
+  });
+  cy.contextMenus({
+    menuItems: [{
+      id: 'revenue',
+      content: 'Revenue',
+      tooltipText: 'Show Revenue',
+      selector: 'node',
+      onClickFunction: showRevenueFor
+    }]
+  });
+}
+
+function addMoviesForNode(from, nodesToAdd){
+  if (!nodesToAdd.length) {
+    $.notify("Nothing to add", "info");
+  }
+  var toAdd = _.map(nodesToAdd, function(movie){
+    var newMovieId = toIdName(movie.movie_title);
+    var newMovie = {group: "nodes", data: getNode(newMovieId, movie.movie_title, "movie")};
+    var edge = {group: "edges", data: getEdge(from.id, newMovieId)}
+    return [newMovie, edge];
+  })
+  updateGraph(_.flatten(toAdd));
+}
+function addAssociationsFor(nodeObj) {
+  var nodesToAdd = 0;
+  switch(nodeObj.type) {
+    case "director":
+      nodesToAdd = _.filter(Demo.Movies, function(movie){
+        return movie.director_name === nodeObj.name && !Demo.Nodes[toIdName(movie.movie_title)];
+      });
+      addMoviesForNode(nodeObj, nodesToAdd)
+      break;
+    case "movie":
+      addActorsAndMovie(_.head(_.filter(Demo.Movies, {movie_title: nodeObj.name}))); // single movie
+      break;
+    case "actor":
+      nodesToAdd = _.filter(Demo.Movies, function(movie){
+        return movie.actor_3_name === nodeObj.name || movie.actor_2_name === nodeObj.name || movie.actor_1_name === nodeObj.name;
+      });
+      addMoviesForNode(nodeObj, nodesToAdd)
+      break;
+
+  }
 }
 function renderFilters() {
   $(".upload-file").hide();
@@ -270,16 +487,26 @@ function renderFilters() {
   this.$genres.html(genresHtml)
   this.$countries.html(countryHtml)
   $(".filters").show();
-  //$("select.selectpicker").selectpicker()
+  $("select").selectpicker()
 }
 function renderChart() {
-  Demo.Series[0].data = [];
+  Demo.scatterSeries[0].data = [];
   _.map(Demo.Movies, function(item){
     if (!isMovieValid(item))return;
-    Demo.Series[0].data.push({x: parseFloat(item.title_year), y: parseFloat(item.imdb_score), movie: item.movie_title, gross: item.gross, budget: item.budget});
+    Demo.scatterSeries[0].data.push({
+      x: parseFloat(item.title_year),
+      y: parseFloat(item.imdb_score),
+      movie: item.movie_title,
+      gross: item.gross,
+      budget: item.budget,
+      id: item.id,
+      color: hueColors[parseInt(item.imdb_score)]
+    });
   });
-  Chart.series = Demo.Series;
-  Highcharts.chart($('.scatter-container')[0], Chart);
+  Chart.scatter.series = Demo.scatterSeries;
+  Highcharts.chart($('.scatter-container')[0], Chart.scatter);
+  $(".nodes").addClass("add-bg")
+  $(".footnote").show()
 }
 function initateEvents() {
   this.$browse.on("change", readCsv(parseCSV));
@@ -290,4 +517,5 @@ Demo = this;
 $(document).ready(function(){
   setParams();
   initateEvents();
+  renderNodes();
 })

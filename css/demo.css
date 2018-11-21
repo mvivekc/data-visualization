@@ -100,3 +100,72 @@ body {
   left: 0;
   top: 0;
 }
+.green{
+  color: #419800;
+}
+.red{
+  color: #CE0000;
+}
+.border-rt {
+  border-right: 2px solid #ccc;
+}
+.border-bt {
+  border-bottom: 2px solid #ccc;
+}
+.radial-node {
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fcfff4+37,e9e9ce+94 */
+  background: #fcfff4; /* Old browsers */
+  background: -moz-radial-gradient(center, ellipse cover, #fcfff4 37%, #e9e9ce 94%); /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, #fcfff4 37%,#e9e9ce 94%); /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, #fcfff4 37%,#e9e9ce 94%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfff4', endColorstr='#e9e9ce',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+.nodes.add-bg{
+
+  background-image: url('../images/legends.png');
+  background-repeat: no-repeat;
+  background-size: 140px 70px;
+  background-position: right 10px top 10px;
+}
+.radial-revenue {
+  background: rgb(255,255,255);
+background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(247,252,187,1) 100%);
+}
+.radial-scatter {
+  background: rgb(255,255,255);
+background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,241,220,1) 100%);
+}
+.m-15{
+  margin-top: 15px;
+}
+
+.footnote{
+  color: #880000;
+  font-size: 14px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+.filters {
+  font-weight: bold;
+  margin: 5px;
+}
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
