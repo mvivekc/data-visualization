@@ -99,6 +99,7 @@ body {
   position: absolute;
   left: 0;
   top: 0;
+  font-size: 26pt;
 }
 .green{
   color: #419800;
@@ -125,7 +126,7 @@ body {
   background-image: url('../images/legends.png');
   background-repeat: no-repeat;
   background-size: 140px 70px;
-  background-position: right 10px top 10px;
+  background-position: left 10px top 10px;
 }
 .radial-revenue {
   background: rgb(255,255,255);
@@ -141,10 +142,9 @@ background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,241,220,1) 
 
 .footnote{
   color: #880000;
-  font-size: 14px;
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
+  font-size: 12px;
+  text-align: center;
+  font-style: italic;
 }
 .filters {
   font-weight: bold;

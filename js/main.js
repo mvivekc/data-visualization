@@ -317,7 +317,7 @@ function parseCSV(result){
   });
   this.scatterSeries = [
     {
-      name: "Movies",
+      name: "IMDB Ratings",
       color: "rgba(0, 0, 255, 0.7)",
       data: [],
       turboThreshold: 5000
