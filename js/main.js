@@ -77,6 +77,8 @@ function updateGraph(finalToAdd){
 }
 function pointClick(e) {
   addActorsAndMovie(Demo.Movies[e.point.id]);
+  $(".nodes").addClass("add-bg")
+  $(".footnote, .actions").show()
 }
 var Chart = {
   scatter: {
@@ -427,6 +429,14 @@ function addGraphEvents() {
     var nodeObj = Demo.Nodes[this.id()];
     addAssociationsFor(nodeObj)
   });
+  $(".clear").on("click", function(){
+    cy.elements().remove();
+  })
+  $(".refresh").on("click", function(){
+    cy.layout({
+      name: 'cose'
+    }).run();
+  });
   cy.contextMenus({
     menuItems: [{
       id: 'revenue',
@@ -473,7 +483,7 @@ function addAssociationsFor(nodeObj) {
 }
 function renderFilters() {
   $(".upload-file").hide();
-  var genresHtml = `<option value="all">All</option>`, countryHtml = `<option value="all">All</option>`;
+  var genresHtml = `<option value="all">Genres</option>`, countryHtml = `<option value="all">Countries</option>`;
   _.map(_.keys(this.Map.byGenre), function(value){
     if (value){
       genresHtml+=`<option value="${value}">${value}</option>`;
@@ -505,8 +515,6 @@ function renderChart() {
   });
   Chart.scatter.series = Demo.scatterSeries;
   Highcharts.chart($('.scatter-container')[0], Chart.scatter);
-  $(".nodes").addClass("add-bg")
-  $(".footnote").show()
 }
 function initateEvents() {
   this.$browse.on("change", readCsv(parseCSV));
