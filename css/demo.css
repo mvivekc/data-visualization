@@ -113,19 +113,13 @@ body {
   border-bottom: 2px solid #ccc;
 }
 .radial-node {
+  position: relative;
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fcfff4+37,e9e9ce+94 */
   background: #fcfff4; /* Old browsers */
   background: -moz-radial-gradient(center, ellipse cover, #fcfff4 37%, #e9e9ce 94%); /* FF3.6-15 */
   background: -webkit-radial-gradient(center, ellipse cover, #fcfff4 37%,#e9e9ce 94%); /* Chrome10-25,Safari5.1-6 */
   background: radial-gradient(ellipse at center, #fcfff4 37%,#e9e9ce 94%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfff4', endColorstr='#e9e9ce',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-}
-.nodes.add-bg{
-
-  background-image: url('../images/legends.png');
-  background-repeat: no-repeat;
-  background-size: 140px 70px;
-  background-position: right 10px top 10px;
 }
 .radial-revenue {
   background: rgb(255,255,255);
@@ -143,7 +137,7 @@ background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,241,220,1) 
   color: #880000;
   font-size: 14px;
   position: absolute;
-  bottom: 20px;
+  top: 20px;
   right: 20px;
 }
 .filters {
@@ -168,4 +162,43 @@ background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,241,220,1) 
     background: white;
     cursor: inherit;
     display: block;
+}
+.legend {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  display: none;
+}
+.legend .legend-item:before {
+  content: ' \25CF';
+  font-size: 100px;
+}
+.legend-item {
+  position: relative;
+  width: 50px;
+}
+.legend span {
+  position: absolute;
+  color: #000;
+  position: absolute;
+  left: 0px;
+  top: 15px;
+}
+.legend .legend-item.movie span {
+  left: 7px;
+}
+.legend .legend-item.actor span {
+  left: 10px;
+}
+.legend-item.director{
+  color: #2f7ed8;
+}
+.legend-item.movie{
+  color: #0d233a;
+}
+.legend-item.actor{
+  color: #8bbc21;
+}
+ .legend.fg {
+   display: block;
 }

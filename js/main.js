@@ -505,7 +505,7 @@ function renderChart() {
   });
   Chart.scatter.series = Demo.scatterSeries;
   Highcharts.chart($('.scatter-container')[0], Chart.scatter);
-  $(".nodes").addClass("add-bg")
+  $(".legend").addClass("fg")
   $(".footnote").show()
 }
 function initateEvents() {
