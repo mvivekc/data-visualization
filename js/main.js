@@ -80,6 +80,28 @@ function pointClick(e) {
   $(".nodes").addClass("add-bg")
   $(".footnote, .actions").show()
 }
+
+function shadeColor(color, percent) {
+
+  var R = parseInt(color.substring(1,3),16);
+  var G = parseInt(color.substring(3,5),16);
+  var B = parseInt(color.substring(5,7),16);
+
+  R = parseInt(R * (100 + percent) / 100);
+  G = parseInt(G * (100 + percent) / 100);
+  B = parseInt(B * (100 + percent) / 100);
+
+  R = (R<255)?R:255;  
+  G = (G<255)?G:255;  
+  B = (B<255)?B:255;  
+
+  var RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
+  var GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
+  var BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+
+  return "#"+RR+GG+BB;
+}
+
 var Chart = {
   scatter: {
     "chart": {
@@ -255,7 +277,29 @@ function stringToArray(text, headerPresent) {
   }
   return final;
 }
+
+function shadeBlend(p,c0,c1) {
+    var n=p<0?p*-1:p,u=Math.round,w=parseInt;
+    if(c0.length>7){
+        var f=c0.split(","),t=(c1?c1:p<0?"rgb(0,0,0)":"rgb(255,255,255)").split(","),R=w(f[0].slice(4)),G=w(f[1]),B=w(f[2]);
+        return "rgb("+(u((w(t[0].slice(4))-R)*n)+R)+","+(u((w(t[1])-G)*n)+G)+","+(u((w(t[2])-B)*n)+B)+")"
+    }else{
+        var f=w(c0.slice(1),16),t=w((c1?c1:p<0?"#000000":"#FFFFFF").slice(1),16),R1=f>>16,G1=f>>8&0x00FF,B1=f&0x0000FF;
+        return "#"+(0x1000000+(u(((t>>16)-R1)*n)+R1)*0x10000+(u(((t>>8&0x00FF)-G1)*n)+G1)*0x100+(u(((t&0x0000FF)-B1)*n)+B1)).toString(16).slice(1)
+    }
+}
+window.COLORS={}
+function colors(){
+  var color1 = "#BBBBE3";
+  var color2 = "#0A0576";
+  var i=1;
+  while(i<=100) {
+    COLORS[i] = shadeBlend(i/100,color1,color2);
+    i++;
+  }
+}
 function setParams() {
+  colors()
   this.Movies = {}
   this.Nodes = {}
   this.Edges = {}
@@ -510,7 +554,7 @@ function renderChart() {
       gross: item.gross,
       budget: item.budget,
       id: item.id,
-      color: hueColors[parseInt(item.imdb_score)]
+      color: COLORS[parseInt(item.imdb_score)*10]
     });
   });
   Chart.scatter.series = Demo.scatterSeries;
