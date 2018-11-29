@@ -93,14 +93,14 @@ body {
   font: 14px helvetica neue, helvetica, arial, sans-serif;
 }
 
-#nodes {
+.connections-title {
+  font-size: 26pt;
+  text-align: center
+}
+.nodes{
   height: 100%;
   width: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
-  font-size: 26pt;
-}
+ }
 .green{
   color: #419800;
 }
@@ -114,19 +114,18 @@ body {
   border-bottom: 2px solid #ccc;
 }
 .radial-node {
-  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fcfff4+37,e9e9ce+94 */
-  background: #fcfff4; /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #fcfff4 37%, #e9e9ce 94%); /* FF3.6-15 */
-  background: -webkit-radial-gradient(center, ellipse cover, #fcfff4 37%,#e9e9ce 94%); /* Chrome10-25,Safari5.1-6 */
-  background: radial-gradient(ellipse at center, #fcfff4 37%,#e9e9ce 94%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfff4', endColorstr='#e9e9ce',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+    background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,1) 0%, #EDEDFF 100%);
 }
-.nodes.add-bg{
+.add-legend.add-bg{
 
   background-image: url('../images/legends.png');
   background-repeat: no-repeat;
   background-size: 140px 70px;
   background-position: left 10px top 10px;
+}
+.radial-node button{
+  background-color: #cdc8c8;
 }
 .radial-revenue {
   background: rgb(255,255,255);
@@ -134,7 +133,7 @@ background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(247,252,187,1) 
 }
 .radial-scatter {
   background: rgb(255,255,255);
-background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,241,220,1) 100%);
+background: radial-gradient(circle, rgba(255,255,255,1) 0%, #FFF9A3 100%);
 }
 .m-15{
   margin-top: 15px;

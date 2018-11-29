@@ -1,17 +1,6 @@
 var MinYear = 1960;
 var MaxYear = (new Date()).getFullYear();
 var doubleClickDelayMs = 350;
-var hueColors = {
-  1: "#d10f02",
-  2: "#EB4F1F",
-  3: "#FF8055",
-  4: "#F6AC33",
-  5: "#B5A108",
-  6: "#f7eb11",
-  7: "#1CA79B",
-  8: "#0C7291",
-  9: "#E60093"
-}
 var previousTapStamp;
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
@@ -29,11 +18,24 @@ function toIdName(name){
 function getNode(id, name, type) {
   //colors: ['#51b5ce', '#89c733', '#54a329','#2f7ed8', '#0d233a', '#8bbc21', '#910000', '#1aadce', '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a'],
   var colors = {
-    "director": "#2f7ed8",
+    "director": "#FD5E00",
     "movie": "#0d233a",
-    "actor": "#8bbc21"
+    "actor": "#FD5E00"
   }
-  this.Nodes[id] = { id: id, name: name, faveColor: '#ccc'};
+  var shapes = {
+    "director": "hexagon",
+    "movie": "ellipse",
+    "actor": "rectangle"
+  }
+  this.Nodes[id] = {
+    id: id,
+    name: name,
+    faveColor: '#ccc',
+    weight: 30
+  };
+  if(shapes[type]){
+    this.Nodes[id].faveShape = shapes[type]
+  }
   if (type) {
     this.Nodes[id].faveColor = colors[type];
     this.Nodes[id].type = type;
@@ -77,7 +79,7 @@ function updateGraph(finalToAdd){
 }
 function pointClick(e) {
   addActorsAndMovie(Demo.Movies[e.point.id]);
-  $(".nodes").addClass("add-bg")
+  $(".add-legend").addClass("add-bg")
   $(".footnote, .actions").show()
 }
 
@@ -198,7 +200,6 @@ var Chart = {
       backgroundColor: 'rgba(255, 255, 255, 0.0)'
     },
     chart: {
-      type: 'column',
       backgroundColor: 'rgba(255, 255, 255, 0.0)'
     },
     title: {
@@ -291,7 +292,7 @@ function shadeBlend(p,c0,c1) {
 window.COLORS={}
 function colors(){
   var color1 = "#BBBBE3";
-  var color2 = "#0A0576";
+  var color2 = "#5A003C";
   var i=1;
   while(i<=100) {
     COLORS[i] = shadeBlend(i/100,color1,color2);
@@ -385,6 +386,10 @@ function parseCSV(result){
   renderChart();
 }
 function renderNodes() {
+  var $container = $(".radial-node")
+  $(".nodes")
+    .height($container.height() - 80)
+    .width($container.width())
   cytoscape({
     container: document.getElementById('nodes'),
 
@@ -396,6 +401,7 @@ function renderNodes() {
     style: cytoscape.stylesheet()
       .selector('node')
         .css({
+        'shape': 'data(faveShape)',
         'content': 'data(name)',
         'font-size': 8,
         'background-color': '#E89393',
@@ -446,21 +452,52 @@ function showRevenueFor(clickedItem){
   }
   var final = [
     {
+      type: "column", 
       name: "Revenue",
       data: [],
-      color: '#658CFF'
+      color: '#36009D'
     },
     {
+      type: "column", 
       name: "Budget",
       data: [],
-      color: '#FCAD12'
+      color: '#FAA200'
     },
+    {
+      type: 'pie',
+      name: 'Total consumption',
+      data: [
+        {
+          name: 'Revenue',
+          y: 0,
+          color: '#36009D'
+        }, {
+          name: 'Budget',
+          y: 0,
+          color: '#FAA200'
+        }
+      ],
+      center: ["90%", "15%"],
+      size: 100,
+      showInLegend: false,
+      dataLabels: {
+        enabled: false
+      }
+    }
   ]
   Chart.bar.xAxis.categories = []
   _.map(data, function(movie){
     Chart.bar.xAxis.categories.push(movie.movie_title)
-    final[0].data.push(parseInt(movie.gross))
-    final[1].data.push(parseInt(movie.budget))
+    var gross = parseInt(movie.gross);
+    final[0].data.push(gross)
+    if (_.isInteger(gross)) {
+      final[2].data[0].y+=gross;
+    }
+    var budget = parseInt(movie.budget);
+    final[1].data.push(budget)
+    if (_.isInteger(budget)) {
+      final[2].data[1].y+=budget;
+    }
   });
   Chart.bar.title.text = `Revenue for ${nodeObj.name}`;
   Chart.bar.series = final;
