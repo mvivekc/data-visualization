@@ -229,21 +229,27 @@ var Chart = {
       useHTML: true,
       shared: true,
       formatter: function(point) {
-        var revenue = this.points[0]
-        var budget = this.points[1]
-        var tooltip = `<div>${revenue.x}</div>`
-        if (revenue && revenue.y && !isNaN(parseInt(revenue.y))) {
-          tooltip += `<div>Gross earnings: ${nFormatter(revenue.y, 2)}</div>`;
+        if (!this.points){
+          var tooltip = `<div><b>${this.point.fieldName}</b></div>`;
+          tooltip += `<div>Total ${this.point.name}: ${nFormatter(this.point.y, 2)}</div>`;
+          return tooltip;
+        } else {
+          var revenue = this.points[0]
+          var budget = this.points[1]
+          var tooltip = `<div>${revenue.x}</div>`
+          if (revenue && revenue.y && !isNaN(parseInt(revenue.y))) {
+            tooltip += `<div>Gross earnings: ${nFormatter(revenue.y, 2)}</div>`;
+          }
+          if (budget && budget.y && !isNaN(parseInt(budget.y))) {
+            tooltip += `<div>Movie budget: ${nFormatter(budget.y, 2)}</div>`;
+          }
+          if (revenue && budget && revenue.y && budget.y) {
+            var net = (revenue.y > budget.y)? (revenue.y - budget.y): (budget.y - revenue.y);
+            var type = (revenue.y > budget.y)? {cls: "green", text: "Profit"}: {cls: "red", text: "Loss"};
+            tooltip += `<div><b>Net profit</b>: <span class='${type.cls}'>${nFormatter(net, 2)} ${type.text}</span></div>`;
+          }
+          return tooltip;
         }
-        if (budget && budget.y && !isNaN(parseInt(budget.y))) {
-          tooltip += `<div>Movie budget: ${nFormatter(budget.y, 2)}</div>`;
-        }
-        if (revenue && budget && revenue.y && budget.y) {
-          var net = (revenue.y > budget.y)? (revenue.y - budget.y): (budget.y - revenue.y);
-          var type = (revenue.y > budget.y)? {cls: "green", text: "Profit"}: {cls: "red", text: "Loss"};
-          tooltip += `<div><b>Net profit</b>: <span class='${type.cls}'>${nFormatter(net, 2)} ${type.text}</span></div>`;
-        }
-        return tooltip;
       }
     }
   }
@@ -253,7 +259,7 @@ function nFormatter(num, digits) {
     { value: 1, symbol: "" },
     { value: 1E3, symbol: "k" },
     { value: 1E6, symbol: "M" },
-    { value: 1E9, symbol: "G" },
+    { value: 1E9, symbol: "B" },
     { value: 1E12, symbol: "T" },
     { value: 1E15, symbol: "P" },
     { value: 1E18, symbol: "E" }
@@ -465,19 +471,21 @@ function showRevenueFor(clickedItem){
     },
     {
       type: 'pie',
-      name: 'Total consumption',
+      name: `Statistics for ${nodeObj.name}`,
       data: [
         {
           name: 'Revenue',
           y: 0,
+          fieldName: nodeObj.name,
           color: '#36009D'
         }, {
           name: 'Budget',
           y: 0,
+          fieldName: nodeObj.name,
           color: '#FAA200'
         }
       ],
-      center: ["90%", "15%"],
+      center: ["95%", "18%"],
       size: 100,
       showInLegend: false,
       dataLabels: {
