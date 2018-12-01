@@ -214,14 +214,27 @@ var Chart = {
     },
     yAxis: {
       min: 0,
+      gridLineWidth: 0,
+      labels: {
+        enabled: false
+      },
       title: {
         text: 'Revenue (in USD )'
       }
     },
+    tooltip: {
+      shared: true
+    },
     plotOptions: {
       column: {
         pointPadding: 0.2,
-        borderWidth: 0
+        borderWidth: 0,
+        dataLabels: {
+          enabled: true,
+          formatter: function () {      
+            return `${(this.point.y && this.point.y > 0)?nFormatter(this.point.y, 2): ""}`;
+          }
+        }
       }
     },
     series: [],
@@ -231,7 +244,9 @@ var Chart = {
       formatter: function(point) {
         if (!this.points){
           var tooltip = `<div><b>${this.point.fieldName}</b></div>`;
-          tooltip += `<div>Total ${this.point.name}: ${nFormatter(this.point.y, 2)}</div>`;
+          var values = _.map(this.point.series.data, "y");
+          var percentage = (values[0] && values[1]) ? `${_.round((this.point.y/_.sum(values))*100, 2)}%`: false;
+          tooltip += `<div>Total ${this.point.name}: ${nFormatter(this.point.y, 2)}${(percentage)?` ( ${percentage} ) `: ''}</div>`;
           return tooltip;
         } else {
           var revenue = this.points[0]
