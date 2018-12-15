@@ -231,7 +231,7 @@ var Chart = {
         borderWidth: 0,
         dataLabels: {
           enabled: true,
-          formatter: function () {      
+          formatter: function () {
             return `${(this.point.y && this.point.y > 0)?nFormatter(this.point.y, 2): ""}`;
           }
         }
@@ -621,7 +621,15 @@ function renderChart() {
   Highcharts.chart($('.scatter-container')[0], Chart.scatter);
 }
 function initateEvents() {
-  this.$browse.on("change", readCsv(parseCSV));
+  this.$browse.on("click", function () {
+    $.ajax({
+      type: "GET",
+      url: "https://raw.githubusercontent.com/sundeepblue/movie_rating_prediction/master/movie_metadata.csv",
+      dataType: "text/csv"
+    }).always(function(data) {
+      parseCSV(data.responseText)
+    });
+  });
   this.$genres.on("change", renderChart);
   this.$countries.on("change", renderChart);
 }
